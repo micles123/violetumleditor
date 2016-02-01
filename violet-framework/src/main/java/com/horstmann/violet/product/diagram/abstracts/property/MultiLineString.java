@@ -21,9 +21,7 @@
 
 package com.horstmann.violet.product.diagram.abstracts.property;
 
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.font.TextAttribute;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -108,8 +106,9 @@ public class MultiLineString implements Serializable, Cloneable {
 	public void setUnderlined(boolean newValue) {
 		underlined = newValue;
 
-        Font newFont = setFontUnderlined(getLabel().getFont(), underlined);
-        getLabel().setFont(newFont);
+        MultiLineLabel label = getLabel();
+        Font newFont = setFontUnderlined(label.getFont(), underlined);
+        label.setFont(newFont);
 
 		setLabelText();
 		isBoundsDirty = true;
