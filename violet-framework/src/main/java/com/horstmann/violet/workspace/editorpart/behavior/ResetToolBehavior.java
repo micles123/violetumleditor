@@ -10,23 +10,19 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 
 /**
- * Created by michal on 06.01.16.
+ * Behavior class which provides reset selected tool to default after successful adding node or edge.
+ * When hotkey is pressed, behavior is turned off until key release
+ *
+ * @author
  */
-public class ResetGraphToolBehavior extends AbstractEditorPartBehavior
+public class ResetToolBehavior extends AbstractEditorPartBehavior
 {
-
-    private int disablingHotkey = KeyEvent.CTRL_DOWN_MASK;
-    private boolean isEnable = true;
-    private GraphTool defaultTool = GraphTool.SELECTION_TOOL;
-
-    private IGraphToolsBar graphToolsBar;
-
     /**
      * Default constructor
      *
      * @param graphToolsBar
      */
-    public ResetGraphToolBehavior(IGraphToolsBar graphToolsBar)
+    public ResetToolBehavior(IGraphToolsBar graphToolsBar)
     {
         this.graphToolsBar = graphToolsBar;
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher()
@@ -34,23 +30,20 @@ public class ResetGraphToolBehavior extends AbstractEditorPartBehavior
             @Override
             public boolean dispatchKeyEvent(KeyEvent e)
             {
-                switch (e.getID())
+                if (isHotkeyPressed(e))
                 {
-                case KeyEvent.KEY_PRESSED:
-                    if (isHotkeyPressed(e))
+                    switch (e.getID())
                     {
+                    case KeyEvent.KEY_PRESSED:
                         isEnable = false;
-                    }
-                    break;
+                        break;
 
-                case KeyEvent.KEY_RELEASED:
-                    if (isHotkeyPressed(e))
-                    {
+                    case KeyEvent.KEY_RELEASED:
                         isEnable = true;
+                        break;
                     }
-                    break;
                 }
-                return true;
+                return false;
             }
         });
     }
@@ -75,19 +68,24 @@ public class ResetGraphToolBehavior extends AbstractEditorPartBehavior
 
     private void resetGraphTool()
     {
-        if (defaultTool.equals(this.graphToolsBar.getSelectedTool()))
+        if (!defaultTool.equals(this.graphToolsBar.getSelectedTool()))
         {
-            return;
-        }
-        if (isEnable)
-        {
-            graphToolsBar.setSelectedTool(defaultTool);
+            if (isEnable)
+            {
+                graphToolsBar.setSelectedTool(defaultTool);
+            }
         }
     }
 
     private boolean isHotkeyPressed(KeyEvent e)
     {
-        return ((e.getKeyCode() | e.getModifiersEx()) & disablingHotkey) == disablingHotkey;
+        return (e.getKeyCode() & disablingHotkey) == disablingHotkey;
     }
+
+    private int disablingHotkey = KeyEvent.VK_CONTROL;
+    private boolean isEnable = true;
+    private GraphTool defaultTool = GraphTool.SELECTION_TOOL;
+
+    private IGraphToolsBar graphToolsBar;
 
 }

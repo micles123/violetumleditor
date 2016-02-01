@@ -150,7 +150,7 @@ public class Workspace implements IWorkspace
             behaviorManager.addBehavior(new CutCopyPasteBehavior(this.graphEditor));
             behaviorManager.addBehavior(new SwingRepaintingBehavior(this.graphEditor));
             behaviorManager.addBehavior(new ColorizeBehavior(this, this.getSideBar().getColorChoiceBar()));
-            behaviorManager.addBehavior(new ResetGraphToolBehavior(this.getSideBar().getGraphToolsBar()));
+            behaviorManager.addBehavior(new ResetToolBehavior(this.getSideBar().getGraphToolsBar()));
         }
         return this.graphEditor;
     }
