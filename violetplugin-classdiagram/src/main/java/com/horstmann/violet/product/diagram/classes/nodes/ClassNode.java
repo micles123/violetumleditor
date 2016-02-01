@@ -5,9 +5,12 @@ import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import com.horstmann.violet.framework.util.StringFilterer;
+import com.horstmann.violet.framework.util.StringFilterer.Filter;
 import com.horstmann.violet.product.diagram.abstracts.node.INode;
 import com.horstmann.violet.product.diagram.abstracts.node.RectangularNode;
 import com.horstmann.violet.product.diagram.abstracts.property.MultiLineString;
+import com.horstmann.violet.product.diagram.classes.util.AccessModifierFilter;
 import com.horstmann.violet.product.diagram.common.PointNode;
 
 /**
@@ -24,18 +27,29 @@ public class ClassNode extends RectangularNode
         name.setSize(MultiLineString.LARGE);
         attributes = new MultiLineString();
         attributes.setJustification(MultiLineString.LEFT);
+        setAccessModifierFilter(attributes);
         methods = new MultiLineString();
         methods.setJustification(MultiLineString.LEFT);
+        setAccessModifierFilter(methods);
     }
-    
-    private Rectangle2D getTopRectangleBounds() {
+
+    private void setAccessModifierFilter(MultiLineString multiLineString) {
+        StringFilterer filterer = multiLineString.getStringFilterer();
+
+        filterer.removeFilter(ACCESS_MODIFIER_FILTER);
+        filterer.addFilter(ACCESS_MODIFIER_FILTER);
+    }
+
+    private Rectangle2D getTopRectangleBounds()
+    {
         Rectangle2D globalBounds = new Rectangle2D.Double(0, 0, 0, 0);
         Rectangle2D nameBounds = name.getBounds();
         globalBounds.add(nameBounds);
         boolean isMethodsEmpty = (methods.getText().length() == 0);
         boolean isAttributesEmpty = (attributes.getText().length() == 0);
         double defaultHeight = DEFAULT_HEIGHT;
-        if (!isMethodsEmpty || !isAttributesEmpty) {
+        if (!isMethodsEmpty || !isAttributesEmpty)
+        {
             defaultHeight = DEFAULT_COMPARTMENT_HEIGHT;
         }
         globalBounds.add(new Rectangle2D.Double(0, 0, DEFAULT_WIDTH, defaultHeight));
@@ -48,14 +62,16 @@ public class ClassNode extends RectangularNode
         Rectangle2D snappedBounds = getGraph().getGridSticker().snap(globalBounds);
         return snappedBounds;
     }
-    
-    private Rectangle2D getMiddleRectangleBounds() {
+
+    private Rectangle2D getMiddleRectangleBounds()
+    {
         Rectangle2D globalBounds = new Rectangle2D.Double(0, 0, 0, 0);
         Rectangle2D attributesBounds = attributes.getBounds();
         globalBounds.add(attributesBounds);
         boolean isMethodsEmpty = (methods.getText().length() == 0);
         boolean isAttributesEmpty = (attributes.getText().length() == 0);
-        if (!isMethodsEmpty || !isAttributesEmpty) {
+        if (!isMethodsEmpty || !isAttributesEmpty)
+        {
             globalBounds.add(new Rectangle2D.Double(0, 0, DEFAULT_WIDTH, DEFAULT_COMPARTMENT_HEIGHT));
         }
         Rectangle2D topBounds = getTopRectangleBounds();
@@ -67,14 +83,16 @@ public class ClassNode extends RectangularNode
         Rectangle2D snappedBounds = getGraph().getGridSticker().snap(globalBounds);
         return snappedBounds;
     }
-    
-    private Rectangle2D getBottomRectangleBounds() {
+
+    private Rectangle2D getBottomRectangleBounds()
+    {
         Rectangle2D globalBounds = new Rectangle2D.Double(0, 0, 0, 0);
         Rectangle2D methodsBounds = methods.getBounds();
         globalBounds.add(methodsBounds);
         boolean isMethodsEmpty = (methods.getText().length() == 0);
         boolean isAttributesEmpty = (attributes.getText().length() == 0);
-        if (!isMethodsEmpty || !isAttributesEmpty) {
+        if (!isMethodsEmpty || !isAttributesEmpty)
+        {
             globalBounds.add(new Rectangle2D.Double(0, 0, DEFAULT_WIDTH, DEFAULT_COMPARTMENT_HEIGHT));
         }
         Rectangle2D middleBounds = getMiddleRectangleBounds();
@@ -107,25 +125,26 @@ public class ClassNode extends RectangularNode
         // Translate g2 if node has parent
         Point2D nodeLocationOnGraph = getLocationOnGraph();
         Point2D nodeLocation = getLocation();
-        Point2D g2Location = new Point2D.Double(nodeLocationOnGraph.getX() - nodeLocation.getX(), nodeLocationOnGraph.getY() - nodeLocation.getY());
+        Point2D g2Location = new Point2D.Double(nodeLocationOnGraph.getX() - nodeLocation.getX(),
+                nodeLocationOnGraph.getY() - nodeLocation.getY());
         g2.translate(g2Location.getX(), g2Location.getY());
         // Perform drawing
         super.draw(g2);
         Rectangle2D currentBounds = getBounds();
         Rectangle2D topBounds = getTopRectangleBounds();
-        Rectangle2D midBounds = getMiddleRectangleBounds(); 
+        Rectangle2D midBounds = getMiddleRectangleBounds();
         Rectangle2D bottomBounds = getBottomRectangleBounds();
         if (topBounds.getWidth() < currentBounds.getWidth())
         {
-        	// We need to re-center the topBounds - only do so if really required to avoid race conditions
-        	topBounds.setRect(topBounds.getX(), topBounds.getY(), currentBounds.getWidth(), topBounds.getHeight());
+            // We need to re-center the topBounds - only do so if really required to avoid race conditions
+            topBounds.setRect(topBounds.getX(), topBounds.getY(), currentBounds.getWidth(), topBounds.getHeight());
         }
         g2.setColor(getBackgroundColor());
         g2.fill(currentBounds);
         g2.setColor(getBorderColor());
         g2.draw(currentBounds);
-        g2.drawLine((int) topBounds.getX(),(int) topBounds.getMaxY(),(int) currentBounds.getMaxX(),(int) topBounds.getMaxY());
-        g2.drawLine((int) bottomBounds.getX(),(int) bottomBounds.getY(),(int) currentBounds.getMaxX(),(int) bottomBounds.getY());
+        g2.drawLine((int) topBounds.getX(), (int) topBounds.getMaxY(), (int) currentBounds.getMaxX(), (int) topBounds.getMaxY());
+        g2.drawLine((int) bottomBounds.getX(), (int) bottomBounds.getY(), (int) currentBounds.getMaxX(), (int) bottomBounds.getY());
         g2.setColor(getTextColor());
         name.draw(g2, topBounds);
         attributes.draw(g2, midBounds);
@@ -153,7 +172,7 @@ public class ClassNode extends RectangularNode
 
     /**
      * Sets the name property value.
-     * 
+     *
      * @param newValue the class name
      */
     public void setName(MultiLineString newValue)
@@ -163,7 +182,7 @@ public class ClassNode extends RectangularNode
 
     /**
      * Gets the name property value.
-     * 
+     *
      * @return the class name
      */
     public MultiLineString getName()
@@ -173,17 +192,18 @@ public class ClassNode extends RectangularNode
 
     /**
      * Sets the attributes property value.
-     * 
+     *
      * @param newValue the attributes of this class
      */
     public void setAttributes(MultiLineString newValue)
     {
         attributes = newValue;
+        setAccessModifierFilter(attributes);
     }
 
     /**
      * Gets the attributes property value.
-     * 
+     *
      * @return the attributes of this class
      */
     public MultiLineString getAttributes()
@@ -193,17 +213,18 @@ public class ClassNode extends RectangularNode
 
     /**
      * Sets the methods property value.
-     * 
+     *
      * @param newValue the methods of this class
      */
     public void setMethods(MultiLineString newValue)
     {
         methods = newValue;
+        setAccessModifierFilter(methods);
     }
 
     /**
      * Gets the methods property value.
-     * 
+     *
      * @return the methods of this class
      */
     public MultiLineString getMethods()
@@ -225,13 +246,13 @@ public class ClassNode extends RectangularNode
         return cloned;
     }
 
-
     private MultiLineString name;
     private MultiLineString attributes;
     private MultiLineString methods;
 
-    private static int DEFAULT_COMPARTMENT_HEIGHT = 20;
-    private static int DEFAULT_WIDTH = 100;
-    private static int DEFAULT_HEIGHT = 60;
+    private static final Filter ACCESS_MODIFIER_FILTER = new AccessModifierFilter();
+    private static final int DEFAULT_COMPARTMENT_HEIGHT = 20;
+    private static final int DEFAULT_WIDTH = 100;
+    private static final int DEFAULT_HEIGHT = 60;
 
 }
