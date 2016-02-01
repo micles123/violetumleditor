@@ -134,18 +134,6 @@ public class MultiLineString implements Serializable, Cloneable
         return font.deriveFont(attributes);
     }
 
-	/**
-	 * Sets the value of the size property.
-	 *
-	 * @param newValue
-	 *            the size, one of SMALL, NORMAL, LARGE
-	 */
-	public void setSize(int newValue) {
-		size = newValue;
-		setLabelText();
-		isBoundsDirty = true;
-	}
-
     /**
      * Gets the string filterer object for this multiline string.
      *
