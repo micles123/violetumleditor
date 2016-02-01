@@ -90,6 +90,8 @@ public class AssociationNode extends RectangularNode
 
     /**
      * Get the bounding rectangle of the name label and the shape
+     *
+     * @return the bounding rectangle
      */
     @Override
     public Rectangle2D getBounds()
