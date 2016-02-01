@@ -24,9 +24,11 @@ package com.horstmann.violet.product.diagram.abstracts.property;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.font.TextAttribute;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
+import java.util.Map;
 
 import com.horstmann.violet.framework.swingextension.MultiLineLabel;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -105,9 +107,26 @@ public class MultiLineString implements Serializable, Cloneable {
 	 */
 	public void setUnderlined(boolean newValue) {
 		underlined = newValue;
+
+        Font newFont = setFontUnderlined(getLabel().getFont(), underlined);
+        getLabel().setFont(newFont);
+
 		setLabelText();
 		isBoundsDirty = true;
 	}
+
+    private Font setFontUnderlined(Font font, boolean underlined)
+    {
+        Map attributes = font.getAttributes();
+
+        if (underlined) {
+            attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+        } else {
+            attributes.remove(TextAttribute.UNDERLINE);
+        }
+
+        return font.deriveFont(attributes);
+    }
 
 	/**
 	 * Sets the value of the size property.
@@ -142,7 +161,7 @@ public class MultiLineString implements Serializable, Cloneable {
 			getLabel().setAlignment(MultiLineLabel.CENTER);
 		else if (justification == RIGHT)
 			getLabel().setAlignment(MultiLineLabel.RIGHT);
-		
+
 	}
 
 	/**
@@ -196,7 +215,7 @@ public class MultiLineString implements Serializable, Cloneable {
 		cloned.text = text;
 		cloned.justification = justification;
 		cloned.size = size;
-		cloned.underlined = underlined;
+		cloned.setUnderlined(underlined);
 		cloned.setLabelText();
 		return cloned;
 	}
