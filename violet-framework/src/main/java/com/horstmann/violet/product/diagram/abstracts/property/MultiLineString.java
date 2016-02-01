@@ -29,73 +29,80 @@ import java.io.Serializable;
 import java.util.Map;
 
 import com.horstmann.violet.framework.swingextension.MultiLineLabel;
+import com.horstmann.violet.framework.util.StringFilterer;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
  * A string that can extend over multiple lines.
  */
-public class MultiLineString implements Serializable, Cloneable {
-	/**
-	 * Constructs an empty, centered, normal size multiline string that is not
-	 * underlined.
-	 */
-	public MultiLineString() {
-		text = "";
-		justification = CENTER;
-		size = NORMAL;
-		underlined = false;
-	}
+public class MultiLineString implements Serializable, Cloneable
+{
+    /**
+     * Constructs an empty, centered, normal size multiline string that is not
+     * underlined.
+     */
+    public MultiLineString()
+    {
+        text = "";
+        justification = CENTER;
+        size = NORMAL;
+        underlined = false;
+        filterer = new StringFilterer();
+    }
 
-	/**
-	 * Sets the value of the text property.
-	 * 
-	 * @param newValue
-	 *            the text of the multiline string
-	 */
-	public void setText(String newValue) {
-		text = newValue;
-		setLabelText();
-		isBoundsDirty = true;
-	}
+    /**
+     * Sets the value of the text property.
+     *
+     * @param newValue the text of the multiline string
+     */
+    public void setText(String newValue)
+    {
+        text = newValue;
+        setLabelText();
+        isBoundsDirty = true;
+    }
 
-	/**
-	 * Gets the value of the text property.
-	 * 
-	 * @return the text of the multiline string
-	 */
-	public String getText() {
-		return text;
-	}
+    /**
+     * Gets the value of the text property.
+     *
+     * @return the text of the multiline string
+     */
+    public String getText()
+    {
+        return text;
+    }
 
-	/**
-	 * Sets the value of the justification property.
-	 * 
-	 * @param newValue
-	 *            the justification, one of LEFT, CENTER, RIGHT
-	 */
-	public void setJustification(int newValue) {
-		justification = newValue;
-		setLabelText();
-		isBoundsDirty = true;
-	}
+    /**
+     * Sets the value of the justification property.
+     *
+     * @param newValue the justification, one of LEFT, CENTER, RIGHT
+     */
+    public void setJustification(int newValue)
+    {
+        justification = newValue;
+        setLabelText();
+        isBoundsDirty = true;
+    }
 
-	/**
-	 * Gets the value of the justification property.
-	 * 
-	 * @return the justification, one of LEFT, CENTER, RIGHT
-	 */
-	public int getJustification() {
-		return justification;
-	}
+    /**
+     * Gets the value of the justification property.
+     *
+     * @return the justification, one of LEFT, CENTER, RIGHT
+     */
+    public int getJustification()
+    {
+        return justification;
+    }
 
-	/**
-	 * Gets the value of the underlined property.
-	 * 
-	 * @return true if the text is underlined
-	 */
-	public boolean isUnderlined() {
-		return underlined;
-	}
+    /**
+     * Gets the value of the underlined property.
+     *
+     * @return true if the text is underlined
+     */
+    public boolean isUnderlined()
+    {
+        return underlined;
+    }
 
 	/**
 	 * Sets the value of the underlined property.
@@ -129,7 +136,7 @@ public class MultiLineString implements Serializable, Cloneable {
 
 	/**
 	 * Sets the value of the size property.
-	 * 
+	 *
 	 * @param newValue
 	 *            the size, one of SMALL, NORMAL, LARGE
 	 */
@@ -139,117 +146,155 @@ public class MultiLineString implements Serializable, Cloneable {
 		isBoundsDirty = true;
 	}
 
-	/**
-	 * Gets the value of the size property.
-	 * 
-	 * @return the size, one of SMALL, NORMAL, LARGE
-	 */
-	public int getSize() {
-		return size;
-	}
+    /**
+     * Gets the string filterer object for this multiline string.
+     *
+     * @return string filterer object
+     */
+    public StringFilterer getStringFilterer()
+    {
+        if (filterer == null)
+            return new StringFilterer();
+        return filterer;
+    }
 
-	public String toString() {
-		return text.replace('\n', '|');
-	}
+    /**
+     * Sets the value of the size property.
+     *
+     * @param newValue the size, one of SMALL, NORMAL, LARGE
+     */
+    public void setSize(int newValue)
+    {
+        size = newValue;
+        setLabelText();
+        isBoundsDirty = true;
+    }
 
-	private void setLabelText() {
-		getLabel().setLabel(text);
-		if (justification == LEFT)
-			getLabel().setAlignment(MultiLineLabel.LEFT);
-		else if (justification == CENTER)
-			getLabel().setAlignment(MultiLineLabel.CENTER);
-		else if (justification == RIGHT)
-			getLabel().setAlignment(MultiLineLabel.RIGHT);
+    /**
+     * Gets the value of the size property.
+     *
+     * @return the size, one of SMALL, NORMAL, LARGE
+     */
+    public int getSize()
+    {
+        return size;
+    }
 
-	}
+    public String toString()
+    {
+        return text.replace('\n', '|');
+    }
 
-	/**
-	 * Gets the bounding rectangle for this multiline string.
-	 * 
-	 * @param g2
-	 *            the graphics context
-	 * @return the bounding rectangle (with top left corner (0,0))
-	 */
-	private Rectangle2D getBounds(Graphics2D g2) {
-		setLabelText();
-		getLabel().validate();
-		if (text.length() == 0)
-			return new Rectangle2D.Double(0, 0, 0, 0);
-		Dimension dim = getLabel().getPreferredSize();
-		return new Rectangle2D.Double(0, 0, dim.getWidth(), dim.getHeight());
-	}
+    private void setLabelText()
+    {
+        String filteredText = getStringFilterer().filterString(text);
 
-	/**
-	 * Gets the bounding rectangle for this multiline string.
-	 * 
-	 * @return the bounding rectangle (with top left corner (0,0))
-	 */
-	public Rectangle2D getBounds() {
-		if (this.isBoundsDirty || this.bounds == null) {
-			BufferedImage image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_RGB);
-			Graphics2D g2 = (Graphics2D) image.getGraphics();
-			this.bounds = getBounds(g2);
-			this.isBoundsDirty = false;
-		}
-		return this.bounds;
-	}
+        getLabel().setLabel(filteredText);
+        if (justification == LEFT)
+            getLabel().setAlignment(MultiLineLabel.LEFT);
+        else if (justification == CENTER)
+            getLabel().setAlignment(MultiLineLabel.CENTER);
+        else if (justification == RIGHT)
+            getLabel().setAlignment(MultiLineLabel.RIGHT);
 
-	/**
-	 * Draws this multiline string inside a given rectangle
-	 * 
-	 * @param g2
-	 *            the graphics context
-	 * @param r
-	 *            the rectangle into which to place this multiline string
-	 */
-	public void draw(Graphics2D g2, Rectangle2D r) {
-		getLabel().setBounds(0, 0, (int) r.getWidth(), (int) r.getHeight());
-		g2.translate(r.getX(), r.getY());
-		getLabel().paint(g2);
-		g2.translate(-r.getX(), -r.getY());
-	}
+    }
 
-	public MultiLineString clone() {
-		MultiLineString cloned = new MultiLineString();
-		cloned.text = text;
-		cloned.justification = justification;
-		cloned.size = size;
-		cloned.setUnderlined(underlined);
-		cloned.setLabelText();
-		return cloned;
-	}
+    /**
+     * Gets the bounding rectangle for this multiline string.
+     *
+     * @param g2 the graphics context
+     * @return the bounding rectangle (with top left corner (0,0))
+     */
+    private Rectangle2D getBounds(Graphics2D g2)
+    {
+        setLabelText();
+        getLabel().validate();
+        if (text.length() == 0)
+            return new Rectangle2D.Double(0, 0, 0, 0);
+        Dimension dim = getLabel().getPreferredSize();
+        return new Rectangle2D.Double(0, 0, dim.getWidth(), dim.getHeight());
+    }
 
-	private MultiLineLabel getLabel() {
-		if (this.label == null) {
-			this.label = new MultiLineLabel("");
-			Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
-			if (size == LARGE) {
-				font = font.deriveFont(Font.BOLD);
-			}
-			if (size == SMALL) {
-				font = font.deriveFont(Font.PLAIN);
-			}
-			this.label.setFont(font);
-			this.label.setMarginWidth(2);
-		}
-		return this.label;
-	}
+    /**
+     * Gets the bounding rectangle for this multiline string.
+     *
+     * @return the bounding rectangle (with top left corner (0,0))
+     */
+    public Rectangle2D getBounds()
+    {
+        if (this.isBoundsDirty || this.bounds == null)
+        {
+            BufferedImage image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g2 = (Graphics2D) image.getGraphics();
+            this.bounds = getBounds(g2);
+            this.isBoundsDirty = false;
+        }
+        return this.bounds;
+    }
 
-	public static final int LEFT = 0;
-	public static final int CENTER = 1;
-	public static final int RIGHT = 2;
-	public static final int LARGE = 3;
-	public static final int NORMAL = 4;
-	public static final int SMALL = 5;
+    /**
+     * Draws this multiline string inside a given rectangle
+     *
+     * @param g2 the graphics context
+     * @param r  the rectangle into which to place this multiline string
+     */
+    public void draw(Graphics2D g2, Rectangle2D r)
+    {
+        getLabel().setBounds(0, 0, (int) r.getWidth(), (int) r.getHeight());
+        g2.translate(r.getX(), r.getY());
+        getLabel().paint(g2);
+        g2.translate(-r.getX(), -r.getY());
+    }
 
-	private String text;
-	@XStreamAsAttribute
-	private int justification;
-	@XStreamAsAttribute
-	private int size;
-	@XStreamAsAttribute
-	private boolean underlined;
-	private transient MultiLineLabel label;
-	private transient boolean isBoundsDirty = true;
-	private transient Rectangle2D bounds;
+    public MultiLineString clone()
+    {
+        MultiLineString cloned = new MultiLineString();
+        cloned.text = text;
+        cloned.justification = justification;
+        cloned.size = size;
+        cloned.underlined = underlined;
+        cloned.setUnderlined(underlined);
+        cloned.filterer = filterer;
+        cloned.setLabelText();
+        return cloned;
+    }
+
+    private MultiLineLabel getLabel()
+    {
+        if (this.label == null)
+        {
+            this.label = new MultiLineLabel("");
+            Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
+            if (size == LARGE)
+            {
+                font = font.deriveFont(Font.BOLD);
+            }
+            if (size == SMALL)
+            {
+                font = font.deriveFont(Font.PLAIN);
+            }
+            this.label.setFont(font);
+            this.label.setMarginWidth(2);
+        }
+        return this.label;
+    }
+
+    public static final int LEFT = 0;
+    public static final int CENTER = 1;
+    public static final int RIGHT = 2;
+    public static final int LARGE = 3;
+    public static final int NORMAL = 4;
+    public static final int SMALL = 5;
+
+    private String text;
+    @XStreamAsAttribute
+    private int justification;
+    @XStreamAsAttribute
+    private int size;
+    @XStreamAsAttribute
+    private boolean underlined;
+    private StringFilterer filterer;
+    private transient MultiLineLabel label;
+    private transient boolean isBoundsDirty = true;
+    private transient Rectangle2D bounds;
 }
