@@ -11,13 +11,13 @@ import java.util.regex.Pattern;
 /**
  * <p>Filter implementation.
  * </p>
- * <p>This filter convert access modifiers:
+ * <p>This filter convert access modifiers from word representation to sign:
  * <ul>
  * <li>public       ->  +   </li>
  * <li>private      ->  -   </li>
  * <li>protected    ->  #   </li>
  * </ul></p>
- *
+ * <p>
  * <p>Use it with
  * {@link com.horstmann.violet.framework.util.StringFilterer StringFilterer class}</p>
  *
@@ -44,40 +44,57 @@ public class AccessModifierFilter implements Filter, Serializable
     @Override
     public String apply(String text)
     {
-        StringBuffer filtered = new StringBuffer();
-        Pattern pattern;
-        Matcher matcher;
+        if (text == null) {
+            return "";
+        }
 
-        String[] lines = text.split(System.lineSeparator());
+        String filteredText = "";
+        String[] lines = text.split("(?<=" + System.lineSeparator() + ")");
 
         for (int line = 0; line < lines.length; line++)
         {
-            String filteredLine = "";
-            for (Map.Entry<String, String> entry : modifierMapping.entrySet())
-            {
-                final String regex = entry.getKey() + "\\s";
-                pattern = Pattern.compile(regex);
-                matcher = pattern.matcher(lines[line]);
-
-                if (matcher.find())
-                {
-                    filteredLine = matcher.replaceFirst(entry.getValue() + ' ');
-                    break;
-                }
-            }
+            String filteredLine = filterLine(lines[line]);
 
             if (filteredLine.isEmpty())
-                filteredLine = lines[line];
-
-            filtered.append(filteredLine);
-
-            if (lines.length > 1 && line != lines.length - 1)
             {
-                filtered.append('\n');
+                filteredLine = lines[line];
+            }
+
+            filteredText += filteredLine;
+        }
+
+        return filteredText;
+    }
+
+    private String filterLine(String line)
+    {
+        String filteredLine = "";
+        for (Map.Entry<String, String> entry : modifierMapping.entrySet())
+        {
+            final String regex = entry.getKey();
+            filteredLine = matchAndReplace(regex, line, entry.getValue());
+
+            if (!filteredLine.isEmpty())
+            {
+                break;
             }
         }
 
-        return filtered.toString();
+        return filteredLine;
+    }
+
+    private String matchAndReplace(String regex, String text, String replaceValue)
+    {
+        Matcher matcher = Pattern.compile(regex).matcher(text);
+
+        if (matcher.find())
+        {
+            return matcher.replaceFirst(replaceValue);
+        }
+        else
+        {
+            return "";
+        }
     }
 
     private static final long serialVersionUID = -6286530069059869293L;

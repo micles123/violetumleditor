@@ -95,6 +95,17 @@ public class StringFiltererTest
         filterer.removeFilter(null);
     }
 
+    @Test(expected = UnsupportedOperationException.class)
+    public void testGetAndChangeListObject() throws Exception
+    {
+        filterer.addFilter(filter1);
+        filterer.addFilter(filter2);
+        List list = filterer.getFilters();
+
+        assertEquals("Should return right filter object", filter1, list.get(list.indexOf(filter1)));
+        list.remove(filter2);
+    }
+
     @Test
     public void testFilterStringWithoutFilters() throws Exception
     {

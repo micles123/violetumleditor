@@ -20,6 +20,12 @@ public class AccessModifierFilterTest
     }
 
     @Test
+    public void testNullTextFiltering() throws Exception
+    {
+        assertEquals("Should return empty string", "", filter.apply(null));
+    }
+
+    @Test
     public void testPublicModifierFiltering() throws Exception
     {
         String text = "public void myPublicMethod(PublicClass publicObject)";
@@ -47,7 +53,7 @@ public class AccessModifierFilterTest
     }
 
     @Test
-    public void testMultiLineText() throws Exception
+    public void testMultiLineTextFiltering() throws Exception
     {
         String text = "protected void myProtectedMethod(ProtectedClass protectedObject)\n" +
                 "private void myPrivateMethod(PrivateClass privateObject)\n" +
@@ -64,5 +70,19 @@ public class AccessModifierFilterTest
                 "+ void myPublicMethod(PublicClass publicObject)";
 
         assertEquals("Should return filtered string", expected, filter.apply(text));
+    }
+
+    @Test
+    public void testTextWithoutMatchingFiltering() throws Exception
+    {
+        String text = "\n\n\nLorem ipsum dolor sit amet,\n" +
+                " consectetur adipiscing elit." +
+                " Nullam mattis ullamcorper lacinia.\n" +
+                " Ut euismod iaculis ipsum, sit amet tristique lacus fringilla vel.\n" +
+                " Duis neque sem, rhoncus id venenatis eget, molestie a ex." +
+                " Vivamus maximus enim justo, non facilisis lorem consectetur sed." +
+                " Sed suscipit urna sem, sit amet dictum nisi laoreet.\n\n\n";
+
+        assertEquals("Should return the same string", text, filter.apply(text));
     }
 }
