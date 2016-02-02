@@ -12,6 +12,9 @@
 		<artifactId>parent</artifactId>
 		<version>1.0.0</version>
 	</parent>
+	<properties>
+		<vector-graphics.version>2.4</vector-graphics.version>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>antlr</groupId>

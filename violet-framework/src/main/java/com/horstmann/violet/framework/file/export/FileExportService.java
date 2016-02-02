@@ -32,7 +32,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
 
-l.Properties;
 
 public class FileExportService
 {
