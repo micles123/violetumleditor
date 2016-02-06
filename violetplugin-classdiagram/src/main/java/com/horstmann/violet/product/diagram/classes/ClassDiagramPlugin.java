@@ -32,7 +32,7 @@ public class ClassDiagramPlugin implements IDiagramPlugin, Violet016FileFilterEx
     @Override
     public String getProvider()
     {
-        return "Alexandre de Pellegrin / Cays S. Horstmann / Michał Leśniak";
+        return "Alexandre de Pellegrin / Cays S. Horstmann";
     }
 
     @Override

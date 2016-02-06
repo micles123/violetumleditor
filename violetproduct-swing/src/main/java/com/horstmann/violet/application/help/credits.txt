@@ -76,6 +76,7 @@ Marc Godin
 Victor Freches
 Alexandre Debril
 Martin Schleyer
+Michał Leśniak
 [Your name must be here] <- contribute!
 
 
